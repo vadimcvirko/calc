@@ -8,8 +8,8 @@ const DATA = {
   metrikaYandex:[ 500, 1000, 2000,],
   analyticsGoogle:[ 850, 1350, 3000],
   sendOrder: 500,
-  dedlineDay:[[2, 7],[3, 10],[7, 14]],
-  dedlinePercent:[20,17,15],
+  deadlineDay:[[2, 7],[3, 10],[7, 14]],
+  deadlinePercent:[20,17,15],
 }
 
 const startButton = document.querySelector('.start-button'),
@@ -19,7 +19,11 @@ const startButton = document.querySelector('.start-button'),
       endButton = document.querySelector('.end-button'),
       total = document.querySelector('.total'),
       fastrange =  document.querySelector('.fast-range'),
-      totalPriceSum = document.querySelector('.total_price__sum'); 
+      totalPriceSum = document.querySelector('.total_price__sum'),
+      adapt = document.getElementById ('adapt'),
+      mobileTemplates = document.getElementById ('mobileTemplates'),
+      typeSite = document.querySelector ('.type-site'),
+      maxDeadline = document.querySelector('.max-deadline'); 
       
 
 
@@ -31,24 +35,35 @@ function hideElem(elem) {
   elem.style.display = 'none';
 }
 
+function RenderTextContent( total , site , maxDay) {
+
+  totalPriceSum.textContent = total;
+  typeSite.textContent = site;
+  maxDeadline.textContent = maxDay;
+
+}
+
 function priceCalculation(elem) {
   let result = 0,
       index = 0,
-      options = [];
+      options = [],
+      site = '',
+      maxDeadlineDay = DATA.deadlineDay[index][1];
 
   
   if (elem.name === 'whichSite') {
       for (const item of formCalculate.elements) {
         if (item.type === 'checkbox') {
             item.checked = false;
-
         }
       }
       hideElem(fastrange);
   }
   for (const item of formCalculate.elements){
       if (item.name === 'whichSite' && item.checked){
-        index = (DATA.whichSite.indexOf(item.value));
+        index = DATA.whichSite.indexOf(item.value);
+        site = item.dataset.site;
+        maxDeadlineDay = DATA.deadlineDay[index][1];
       } else if (item.classList.contains('calc-handler') && item.checked){
         options.push(item.value)
       }
@@ -72,14 +87,21 @@ function priceCalculation(elem) {
   result += DATA.price[index];
 
 
+  RenderTextContent(result, site , maxDeadlineDay)
 
 
-
-  totalPriceSum.textContent = result;
+  
 }
 
 function handlerCallBackForm(event) {
     const target = event.target;
+
+    if (adapt.checked){
+      mobileTemplates.disabled = false;
+    } else {
+      mobileTemplates.disabled = true;
+      mobileTemplates.checked = false;
+    }
 
     if (target.classList.contains('want-faster')){
         target.checked ? showElem(fastrange) : hideElem(fastrange);
